@@ -6,6 +6,8 @@ name = "pypi-proxy"
 [packages]
 django = "*"
 djangorestframework = "*"
+psycopg2 = "*"
+pillow = "*"
 
 [dev-packages]
 

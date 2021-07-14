@@ -17,5 +17,12 @@
 !.vscode/extensions.json
 .history/*
 
+# Django migrations
+./recepi_api/recipe/migrations/
+./recepi_api/user/migrations/
+
+# Default DB
+./recepi_api/db.sqlite3
+
 # misc
 Pipfile.lock
