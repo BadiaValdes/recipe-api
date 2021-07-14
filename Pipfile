@@ -1,0 +1,13 @@
+[[source]]
+url = "http://localhost:8081/repository/pypi-proxy/simple"
+verify_ssl = false
+name = "pypi-proxy"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
