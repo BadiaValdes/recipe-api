@@ -35,3 +35,5 @@ urlpatterns = [
     path('userLike/', userlike_api.UserLikeList.as_view(), name="userLike"),
     re_path('userLike/(?P<pk>[0-9a-f]{10})/', userlike_api.UserLikeDetail.as_view(), name="userLike_details"),
 ]
+
+

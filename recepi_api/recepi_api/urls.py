@@ -16,13 +16,26 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.urlpatterns import format_suffix_patterns
+# JWT AUTH
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
+
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')), # For authentication
+    # Normal auth
+    path('api-auth/', include('rest_framework.urls')),  # For authentication
+    # JWT auth
+    path('auth/login/', obtain_jwt_token),
+    path('auth/refresh-token/', refresh_jwt_token),
     path('api/', include('recipe.urls')),
-    path('',include('user.urls')),
+    path('', include('user.urls')),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Accept suffix in the url like json
 urlpatterns = format_suffix_patterns(urlpatterns)

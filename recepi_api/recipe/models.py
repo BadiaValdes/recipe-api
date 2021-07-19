@@ -27,7 +27,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class Product(models.Model):
     id = models.CharField(primary_key=True, default=generate_uuid, editable=False, unique=True, max_length=10)
     slug = models.SlugField(max_length=25, default=get_RandomString, unique=True, blank=True)

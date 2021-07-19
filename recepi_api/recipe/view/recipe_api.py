@@ -48,4 +48,4 @@ class RecipeHig(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         snippet = self.get_object()
-        return Response([snippet.name, "---" ,snippet.description])
+        return Response([snippet.name, "---", snippet.description])

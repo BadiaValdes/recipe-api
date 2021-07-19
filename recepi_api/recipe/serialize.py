@@ -64,9 +64,16 @@ class UserLikeSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     # Everything must be inside of the meta class
+    #fk_difficult = DifficultySerializer(many=False) # Nested JSON serializer
+    #fk_category = CategorySerializer(many=False) # Nested JSON serializer
+    
+    fk_difficult = serializers.StringRelatedField(many=False) # __str__ nested serialize
+    fk_category = serializers.StringRelatedField(many=False) # __str__ nested serialize
+    #fk_user = serializers.StringRelatedField(many=False) # __str__ nested serialize
+    
     class Meta:
         model = Recipe
-        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps']
+        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'fk_user']
 
 
 class IngredientSerializer(serializers.ModelSerializer):
