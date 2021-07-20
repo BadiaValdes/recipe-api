@@ -60,6 +60,8 @@ class Recipe(models.Model):
         return self.name
 
 
+
+
 class Measurement(models.Model):
     id = models.CharField(primary_key=True, default=generate_uuid, editable=False, unique=True, max_length=10)
     slug = models.SlugField(max_length=10, default=get_RandomString, unique=True, blank=True)
@@ -71,11 +73,14 @@ class Measurement(models.Model):
 
 class Ingredient(models.Model):
     id = models.CharField(primary_key=True, default=generate_uuid, editable=False, unique=True, max_length=10)
-    fk_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, null=True)
+    fk_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, null=True, related_name='recipe_ingredient')
     fk_product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     fk_measurement_unit = models.ForeignKey(Measurement, on_delete=models.CASCADE, null=True)
     main_ingredient = models.BooleanField()
     amount = models.FloatField()
+
+    def __str__(self):
+        return '%s - %d%s' % (self.fk_product.name, self.amount, self.fk_measurement_unit.name)
 
 
 class UserLike(models.Model):
