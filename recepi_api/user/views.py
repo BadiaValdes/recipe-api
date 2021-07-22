@@ -1,7 +1,9 @@
+from rest_framework.response import Response
+
 from .models import User
 from rest_framework import generics
 
-from .serialize import UserSerializer
+from .serialize import UserSerializer, UserDetailsSerializer
 
 
 class UserList(generics.ListAPIView):
@@ -11,7 +13,8 @@ class UserList(generics.ListAPIView):
 
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailsSerializer
+    
 
 
 from django.shortcuts import render

@@ -9,3 +9,11 @@ class UserSerializer (serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
+class UserDetailsSerializer (serializers.ModelSerializer):
+    #recipe = serializers.PrimaryKeyRelatedField(many=True, queryset=Recipe.objects.all())
+
+    class Meta:
+        model = User
+        fields = ['id', 'last_login', 'username', 'first_name', 'last_name','email','date_joined','avatar','groups']
+
