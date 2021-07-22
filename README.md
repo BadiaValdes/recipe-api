@@ -18,3 +18,7 @@
 - capture the values of the URL if there is any one
 - Serialize the data fetch form Object
 - Return it
+
+> request.data is like a 'POST', 'PUT' and 'PATCH', all in one, and can work with arbitrary data 
+
+## JWT AUTH
