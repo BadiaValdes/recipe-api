@@ -12,6 +12,7 @@ class UserSerializer (serializers.ModelSerializer):
 
 class UserDetailsSerializer (serializers.ModelSerializer):
     #recipe = serializers.PrimaryKeyRelatedField(many=True, queryset=Recipe.objects.all())
+    groups = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = User

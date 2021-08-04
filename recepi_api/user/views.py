@@ -9,14 +9,16 @@ from .serialize import UserSerializer, UserDetailsSerializer
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    
 
 
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailsSerializer
     
+    
+    
+    
+    
+    
 
-
-from django.shortcuts import render
-
-# Create your views here.

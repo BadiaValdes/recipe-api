@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Product, Difficulty, Ingredient, UserLike, Measurement, Recipe
 
+from django.http import HttpResponse
 
 # Is like a django form
 
@@ -74,6 +75,22 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'fk_user', 'recipe_ingredient']
+
+class RecipeSerializerCreate(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'fk_user']
+
+    def create(self, validated_data):
+          print(validated_data)
+          print("pase por aqui")
+          #ingredients = validated_data.pop('recipe_ingredient')
+
+          #recipe = Recipe.objects.create(**validated_data)
+          #Ingredient.objects.create(fk_recipe=recipe, **ingredients)
+          return HttpResponse({'message': 'Recipe Created'}, status=200)
 
 class IngredientSerializer(serializers.ModelSerializer):
     # Everything must be inside of the meta class

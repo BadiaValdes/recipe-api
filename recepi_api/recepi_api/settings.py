@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-v%iphpg!)wjaob$51$cpo&t*(m1*h@bofhsel=do=tn02#8w^m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -51,24 +51,54 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # CORS
-CORS_ALLOWED_ORIGINS = [
+
+CORS_ORIGIN_WHITELIST = [
     "http://localhost:4200",
     "http://127.0.0.1:4200"
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    '127.0.0.1:4200',
+    'localhost:4200'
+]
+
+CORS_REPLACE_HTTPS_REFER = True
 
 
 # form custom user model

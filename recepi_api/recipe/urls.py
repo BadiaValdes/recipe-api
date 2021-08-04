@@ -2,6 +2,8 @@ from django.urls import path, re_path
 from .view import category_api, recipe_api, userlike_api, difficulty_api, ingredient_api, producto_api, measure_api
 from . import views
 
+
+
 urlpatterns = [
     # root
     path('', views.api_root),
@@ -28,6 +30,7 @@ urlpatterns = [
 
     # Recipe
     path('recipe/', recipe_api.RecipeList.as_view(), name="recipe"),
+    path('recipe/create', recipe_api.RecipeCreate.as_view(), name="recipe_create"),
     re_path('recipe/(?P<pk>[0-9a-f]{10})/', recipe_api.RecipeDetail.as_view(), name="recipe_details"),
     re_path('recipe/html/(?P<pk>[0-9a-f]{10})', recipe_api.RecipeHig.as_view(), name="recipe_html"),
 
