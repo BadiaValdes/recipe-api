@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, Difficulty, Ingredient, UserLike, Measurement, Recipe
+from recipe.models import Category, Product, Difficulty, Ingredient, UserLike, Measurement, Recipe, RecipeImage
 
 from django.http import HttpResponse
 
@@ -74,23 +74,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'fk_user', 'recipe_ingredient']
-
-class RecipeSerializerCreate(serializers.ModelSerializer):
-
-
-    class Meta:
-        model = Recipe
-        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'fk_user']
-
-    def create(self, validated_data):
-          print(validated_data)
-          print("pase por aqui")
-          #ingredients = validated_data.pop('recipe_ingredient')
-
-          #recipe = Recipe.objects.create(**validated_data)
-          #Ingredient.objects.create(fk_recipe=recipe, **ingredients)
-          return HttpResponse({'message': 'Recipe Created'}, status=200)
+        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'recipe_ingredient']
 
 class IngredientSerializer(serializers.ModelSerializer):
     # Everything must be inside of the meta class
@@ -98,4 +82,45 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = ['id', 'fk_recipe', 'fk_product', 'fk_measurement_unit', 'main_ingredient', 'amount']
 
+class RecipeSerializerCreate(serializers.ModelSerializer):
 
+    class Meta:
+        model = Recipe
+        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps','fk_user']
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('recipe_ingredient')
+        recipe = Recipe.objects.create(**validated_data)
+        print(ingredients)
+        mainOne = False;
+        for i in ingredients:
+            measurement = Measurement.objects.get(id=i['measurement'])
+            print("Measuremnt")
+            print(measurement)
+            product = Product.objects.get(id=i['product'])
+            print("Product")
+            print(product)
+            if i['principal']:
+                mainOne = True
+            else:
+                mainOne = False
+            Ingredient.objects.create(main_ingredient=mainOne,
+                                      amount=i['cantidad'],
+                                      fk_measurement_unit_id=measurement.id,
+                                      fk_product_id=product.id,
+                                      fk_recipe_id=recipe.id )
+            print(i['product'])
+        print("pase por aqui")
+
+    #
+    #       recipe = Recipe.objects.create(**validated_data)
+    #       #Ingredient.objects.create(fk_recipe=recipe, **ingredients)
+        return HttpResponse({'message': 'Recipe Created'}, status=200)
+
+
+
+
+class ReciepeImageSerialize(serializers.ModelSerializer):
+    class Meta:
+        model = RecipeImage
+        fields = ['image']

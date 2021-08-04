@@ -7,7 +7,9 @@ from django.utils.crypto import get_random_string
 
 
 def get_upload_path(instance, filename):
-    return os.path.join("{0}".format(instance.fk_user.username), filename)
+    return os.path.join(
+        #"{0}".format(instance.fk_user.username),
+        filename)
 
 
 def generate_uuid():
@@ -50,17 +52,22 @@ class Recipe(models.Model):
     id = models.CharField(primary_key=True, default=generate_uuid, editable=False, unique=True, max_length=10)
     slug = models.SlugField(max_length=40, default=get_RandomString, unique=True, blank=True)
     name = models.CharField(max_length=40, null=True, blank=True)
-    img = models.ImageField(upload_to=get_upload_path, default='img/default.png', null=True, blank=True)
-    fk_user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=True)
+    img = models.FileField(upload_to=get_upload_path, default='img/default.png', null=True, blank=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     fk_difficult = models.ForeignKey(Difficulty, on_delete=models.CASCADE, null=True)
     fk_category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     steps = models.CharField(max_length=255, null=True, blank=True)
+    fk_user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
 
 
+class RecipeImage(models.Model):
+    image = models.FileField(blank=True, null=True)
+    #fk_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):
+        return self.image.name
 
 
 class Measurement(models.Model):
