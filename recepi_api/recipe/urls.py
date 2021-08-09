@@ -32,6 +32,7 @@ urlpatterns = [
     path('recipe/', recipe_api.RecipeList.as_view(), name="recipe"),
     path('recipe/create', recipe_api.RecipeCreate.as_view(), name="recipe_create"),
     re_path('recipe/(?P<pk>[0-9a-f]{10})/', recipe_api.RecipeDetail.as_view(), name="recipe_details"),
+    path('recipe/<slug:slug>/', recipe_api.RecipeDetail.as_view(), name="recipe_image"),
     re_path('recipe/html/(?P<pk>[0-9a-f]{10})', recipe_api.RecipeHig.as_view(), name="recipe_html"),
     path('recipe/image/', recipe_api.RecipeUploadImage.as_view(), name="recipe_image"),
 

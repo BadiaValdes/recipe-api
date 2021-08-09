@@ -88,7 +88,7 @@ class Ingredient(models.Model):
     amount = models.FloatField()
 
     def __str__(self):
-        return '%s - %d%s' % (self.fk_product.name, self.amount, self.fk_measurement_unit.name)
+        return '%s-%d %s-%s' % (self.fk_product.name, self.amount, self.fk_measurement_unit.name, self.main_ingredient)
 
 
 class UserLike(models.Model):

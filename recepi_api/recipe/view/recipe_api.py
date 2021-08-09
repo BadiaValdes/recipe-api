@@ -36,7 +36,10 @@ class RecipeList(generics.ListCreateAPIView):
     # The most generic you can be
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    #permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+   
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, 
+    #IsOwnerOrReadOnly
+    ]
 
 
     # ADD the current user
@@ -47,6 +50,7 @@ class RecipeList(generics.ListCreateAPIView):
 class RecipeCreate(generics.ListCreateAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializerCreate
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
     def perform_create(self, serializer, *args, **kwargs):
@@ -111,8 +115,10 @@ class RecipeUploadImage(APIView):
 class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    # for search propuse
+    lookup_field = 'slug'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          #IsOwnerOrReadOnly
+                          IsOwnerOrReadOnly
                           ]
 
 
