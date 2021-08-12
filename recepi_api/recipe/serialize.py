@@ -3,6 +3,8 @@ from recipe.models import Category, Product, Difficulty, Ingredient, UserLike, M
 
 from django.http import HttpResponse
 
+import json
+
 # Is like a django form
 
 # class CategorySerializer(serializers.Serializer):
@@ -72,7 +74,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     # Everything must be inside of the meta class
     # fk_difficult = DifficultySerializer(many=False) # Nested JSON serializer
     # fk_category = CategorySerializer(many=False) # Nested JSON serializer
-    recipe_ingredient = serializers.StringRelatedField(many=True) # __str__ nested serialize with other model that has a relationship with this one
+    recipe_ingredient = serializers.StringRelatedField(many=True, read_only=True) # __str__ nested serialize with other model that has a relationship with this one
     #recipe_ingredient = IngredientSerializer(many=True)
     fk_difficult = serializers.StringRelatedField(many=False)  # __str__ nested serialize
     fk_category = serializers.StringRelatedField(many=False)  # __str__ nested serialize
@@ -83,6 +85,38 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         lookup_field = 'slug'
         fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'recipe_ingredient', 'fk_user']
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('recipe_ingredient')
+
+        print(validated_data.get('img'))
+        recipe = Recipe.objects.create(**validated_data)
+        print(ingredients)
+        mainOne = False;
+        for i in ingredients:
+            measurement = Measurement.objects.get(id=i['measurement'])
+            print("Measuremnt")
+            print(measurement)
+            product = Product.objects.get(id=i['product'])
+            print("Product")
+            print(product)
+            if i['principal']:
+                mainOne = True
+            else:
+                mainOne = False
+            Ingredient.objects.create(main_ingredient=mainOne,
+                                      amount=i['cantidad'],
+                                      fk_measurement_unit_id=measurement.id,
+                                      fk_product_id=product.id,
+                                      fk_recipe_id=recipe.id)
+            print(i['product'])
+        print("pase por aqui")
+
+        #
+        #       recipe = Recipe.objects.create(**validated_data)
+        #       #Ingredient.objects.create(fk_recipe=recipe, **ingredients)
+        return recipe
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     # Everything must be inside of the meta class
@@ -98,6 +132,8 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
+
+        print(validated_data.get('img'))
         recipe = Recipe.objects.create(**validated_data)
         print(ingredients)
         mainOne = False;
@@ -123,7 +159,7 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
     #
     #       recipe = Recipe.objects.create(**validated_data)
     #       #Ingredient.objects.create(fk_recipe=recipe, **ingredients)
-        return HttpResponse({'message': 'Recipe Created'}, status=200)
+        return recipe
 
 
 
@@ -132,3 +168,59 @@ class ReciepeImageSerialize(serializers.ModelSerializer):
     class Meta:
         model = RecipeImage
         fields = ['image']
+        
+class RecipeSerializerJSON(serializers.ModelSerializer):
+    # Everything must be inside of the meta class
+    #fk_difficult = DifficultySerializer(many=False) # Nested JSON serializer
+    #fk_category = CategorySerializer(many=False) # Nested JSON serializer
+    #recipe_ingredient = serializers.StringRelatedField(many=True) # __str__ nested serialize with other model that has a relationship with this one
+    recipe_ingredient = IngredientSerializer(many=True, read_only=True)
+    #fk_difficult = serializers.StringRelatedField(many=False)  # __str__ nested serialize
+    #fk_category = serializers.StringRelatedField(many=False)  # __str__ nested serialize
+
+    # fk_user = serializers.StringRelatedField(many=False) # __str__ nested serialize
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'recipe_ingredient', 'fk_user']
+
+    def update(self, instance, validated_data):
+        recipe_ingredientes = validated_data.pop('recipe_ingredient')
+        print(recipe_ingredientes)
+        recipe_ingredientes_instance = Ingredient.objects.filter(fk_recipe_id=instance.id)
+        recipe_ingredientes_instance = list(recipe_ingredientes_instance)
+        img = validated_data.pop('img')
+        print(recipe_ingredientes_instance)
+
+        Recipe.objects.filter(id=instance.id).update(**validated_data)
+
+        # Poner mejor esta parte
+        # instance.slug = validated_data.get('slug')
+        # instance.name = validated_data.get('name')
+        # instance.img = validated_data.get('img')
+        # instance.description = validated_data.get('description')
+        # instance.fk_difficult = validated_data.get('fk_difficult')
+        # instance.fk_category = validated_data.get('fk_category')
+        # instance.steps = validated_data.get('fk_category')
+
+        for recipe_ing in recipe_ingredientes:
+            print(recipe_ing)
+            measurement = Measurement.objects.get(id=recipe_ing['measurement'])
+            product = Product.objects.get(id=recipe_ing['product'])
+            if len(recipe_ingredientes_instance) > 0:
+                ingredient = recipe_ingredientes_instance.pop(0)
+                print(ingredient)
+
+                ingredient.fk_measurement_unit = measurement
+                ingredient.fk_product = product
+                ingredient.amount = recipe_ing['cantidad']
+                ingredient.main_ingredient = recipe_ing['principal']
+                ingredient.save()
+            else:
+                Ingredient.objects.create(main_ingredient=recipe_ing['principal'],
+                                          amount=recipe_ing['cantidad'],
+                                          fk_measurement_unit_id=measurement.id,
+                                          fk_product_id=product.id,
+                                          fk_recipe_id=instance.id)
+
+        return HttpResponse({'message': 'Recipe Created'}, status=200)

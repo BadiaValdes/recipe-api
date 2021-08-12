@@ -21,7 +21,7 @@ from user.models import User
 from django.http import HttpResponse
 
 ## Serialize
-from ..serialize import RecipeSerializer, RecipeSerializerCreate, ReciepeImageSerialize
+from ..serialize import RecipeSerializer, RecipeSerializerCreate, ReciepeImageSerialize, RecipeSerializerJSON
 ############
 
 ## Permissions
@@ -38,8 +38,15 @@ class RecipeList(generics.ListCreateAPIView):
     serializer_class = RecipeSerializer
    
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, 
-    #IsOwnerOrReadOnly
+    IsOwnerOrReadOnly
     ]
+
+
+    def perform_create(self, serializer):
+        ri = json.loads(self.request.POST['recipe_ingredient'])
+        print(ri[0]["product"])
+        print("pase por aqui")
+        serializer.save(recipe_ingredient=ri)
 
 
     # ADD the current user
@@ -120,6 +127,22 @@ class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly
                           ]
+      
+                          
+class RecipeDetailJSON(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializerJSON
+    # for search propuse
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly
+                          ]
+
+    def perform_update(self, serializer):
+        ri = json.loads(self.request.POST['recipe_ingredient'])
+        #id = self.kwargs.get('pk')
+
+        serializer.save(recipe_ingredient=ri)
+        # serializer.save(fk_user=self.request.user)
 
 
 # HTML REPRESENTATION of the model
