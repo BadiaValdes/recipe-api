@@ -5,6 +5,8 @@ from django.http import HttpResponse
 
 import json
 
+# this part is important for object's CRUD
+
 # Is like a django form
 
 # class CategorySerializer(serializers.Serializer):
@@ -31,11 +33,12 @@ import json
 #         return instance
 
 # With serializer.Model, like formModel
+
 class CategorySerializer(serializers.ModelSerializer):
     # Everything must be inside of the meta class
     class Meta:
-        model = Category
-        fields = ['id', 'slug', 'name']
+        model = Category # Model
+        fields = ['id', 'slug', 'name'] # Fields to show
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -86,20 +89,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
         fields = ['id', 'slug', 'name', 'img', 'description', 'fk_difficult', 'fk_category', 'steps', 'recipe_ingredient', 'fk_user']
 
-    def create(self, validated_data):
-        ingredients = validated_data.pop('recipe_ingredient')
+    def create(self, validated_data): # Create method
+        ingredients = validated_data.pop('recipe_ingredient') # In the view, we pass the recipeIngredients to the serializer.
+        # The serializer can't handle the nested json for creation an update 
+        
 
-        print(validated_data.get('img'))
-        recipe = Recipe.objects.create(**validated_data)
-        print(ingredients)
-        mainOne = False;
+
+        recipe = Recipe.objects.create(**validated_data) # We create the recipe with the valid data object
+  
+        mainOne = False; 
         for i in ingredients:
-            measurement = Measurement.objects.get(id=i['measurement'])
-            print("Measuremnt")
-            print(measurement)
+            measurement = Measurement.objects.get(id=i['measurement']) 
+
             product = Product.objects.get(id=i['product'])
-            print("Product")
-            print(product)
+
             if i['principal']:
                 mainOne = True
             else:
@@ -109,8 +112,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                                       fk_measurement_unit_id=measurement.id,
                                       fk_product_id=product.id,
                                       fk_recipe_id=recipe.id)
-            print(i['product'])
-        print("pase por aqui")
+            
+    
 
         #
         #       recipe = Recipe.objects.create(**validated_data)
@@ -133,17 +136,15 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredient')
 
-        print(validated_data.get('img'))
+        
         recipe = Recipe.objects.create(**validated_data)
-        print(ingredients)
+    
         mainOne = False;
         for i in ingredients:
             measurement = Measurement.objects.get(id=i['measurement'])
-            print("Measuremnt")
-            print(measurement)
+
             product = Product.objects.get(id=i['product'])
-            print("Product")
-            print(product)
+
             if i['principal']:
                 mainOne = True
             else:
@@ -153,28 +154,27 @@ class RecipeSerializerCreate(serializers.ModelSerializer):
                                       fk_measurement_unit_id=measurement.id,
                                       fk_product_id=product.id,
                                       fk_recipe_id=recipe.id )
-            print(i['product'])
-        print("pase por aqui")
+
 
     #
     #       recipe = Recipe.objects.create(**validated_data)
     #       #Ingredient.objects.create(fk_recipe=recipe, **ingredients)
-        return recipe
+        return recipe # Here we can return a HTTP Response or an objecto
 
 
 
 
-class ReciepeImageSerialize(serializers.ModelSerializer):
+class ReciepeImageSerialize(serializers.ModelSerializer): # this class was for test propouse
     class Meta:
         model = RecipeImage
         fields = ['image']
         
-class RecipeSerializerJSON(serializers.ModelSerializer):
+class RecipeSerializerJSON(serializers.ModelSerializer): # Return de value but with a nested json
     # Everything must be inside of the meta class
     #fk_difficult = DifficultySerializer(many=False) # Nested JSON serializer
     #fk_category = CategorySerializer(many=False) # Nested JSON serializer
     #recipe_ingredient = serializers.StringRelatedField(many=True) # __str__ nested serialize with other model that has a relationship with this one
-    recipe_ingredient = IngredientSerializer(many=True, read_only=True)
+    recipe_ingredient = IngredientSerializer(many=True, read_only=True) # the read only means that the field will not be modified
     #fk_difficult = serializers.StringRelatedField(many=False)  # __str__ nested serialize
     #fk_category = serializers.StringRelatedField(many=False)  # __str__ nested serialize
 
@@ -186,11 +186,11 @@ class RecipeSerializerJSON(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         recipe_ingredientes = validated_data.pop('recipe_ingredient')
-        print(recipe_ingredientes)
+        
         recipe_ingredientes_instance = Ingredient.objects.filter(fk_recipe_id=instance.id)
         recipe_ingredientes_instance = list(recipe_ingredientes_instance)
-        img = validated_data.pop('img')
-        print(recipe_ingredientes_instance)
+        #img = validated_data.pop('img')
+        
 
         Recipe.objects.filter(id=instance.id).update(**validated_data)
 
@@ -204,12 +204,12 @@ class RecipeSerializerJSON(serializers.ModelSerializer):
         # instance.steps = validated_data.get('fk_category')
 
         for recipe_ing in recipe_ingredientes:
-            print(recipe_ing)
+         
             measurement = Measurement.objects.get(id=recipe_ing['measurement'])
             product = Product.objects.get(id=recipe_ing['product'])
             if len(recipe_ingredientes_instance) > 0:
                 ingredient = recipe_ingredientes_instance.pop(0)
-                print(ingredient)
+               
 
                 ingredient.fk_measurement_unit = measurement
                 ingredient.fk_product = product

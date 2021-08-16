@@ -44,9 +44,9 @@ class RecipeList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         ri = json.loads(self.request.POST['recipe_ingredient'])
-        print(ri[0]["product"])
-        print("pase por aqui")
-        serializer.save(recipe_ingredient=ri)
+        cat = Category.objects.get(id=self.request.POST['fk_category'])
+        dif = Difficulty.objects.get(id=self.request.POST['fk_difficult'])
+        serializer.save(recipe_ingredient=ri, fk_category=cat, fk_difficult=dif)
 
 
     # ADD the current user
@@ -62,8 +62,6 @@ class RecipeCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer, *args, **kwargs):
         ri = json.loads(self.request.POST['recipe_ingredient'])
-        print(ri[0]["product"])
-        print("pase por aqui")
         serializer.save(recipe_ingredient=ri)
         #serializer.save(fk_user=self.request.user)
 

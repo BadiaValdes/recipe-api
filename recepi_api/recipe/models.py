@@ -53,10 +53,10 @@ class Recipe(models.Model):
     slug = models.SlugField(max_length=40, default=get_RandomString, unique=True, blank=True)
     name = models.CharField(max_length=40, null=True, blank=True)
     img = models.FileField(upload_to=get_upload_path, default='img/default.png', null=True, blank=True)
-    description = models.CharField(max_length=255, null=True, blank=True)
+    description = models.CharField(max_length=500, null=True, blank=True)
     fk_difficult = models.ForeignKey(Difficulty, on_delete=models.CASCADE, null=True)
     fk_category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    steps = models.CharField(max_length=255, null=True, blank=True)
+    steps = models.CharField(max_length=500, null=True, blank=True)
     fk_user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
