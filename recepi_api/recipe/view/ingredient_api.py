@@ -21,7 +21,7 @@ class IngredienttList(generics.ListCreateAPIView):
     # The most generic you can be
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-   # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+   #e permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class IngredientDetail(generics.RetrieveUpdateDestroyAPIView):

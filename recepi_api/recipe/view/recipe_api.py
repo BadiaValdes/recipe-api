@@ -14,9 +14,13 @@ from rest_framework.response import Response
 ###########
 
 ## Model
-from ..models import Recipe,Difficulty,Category
+from ..models import Recipe,Difficulty,Category,Product,Ingredient
 from user.models import User
 ########
+
+## Decorators
+from rest_framework.decorators import api_view
+#############
 
 from django.http import HttpResponse
 
@@ -28,14 +32,20 @@ from ..serialize import RecipeSerializer, RecipeSerializerCreate, ReciepeImageSe
 from rest_framework import permissions
 from ..permissions import IsOwnerOrReadOnly
 
+## QUery
+from django.db.models import Q, Count
+
 ##############
 
 import json
 
-class RecipeList(generics.ListCreateAPIView):
-    # The most generic you can be
+# Don't repeat yourself
+class RecipeObject (object):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+
+class RecipeList(RecipeObject, generics.ListCreateAPIView):
+    # The most generic you can be
    
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, 
     IsOwnerOrReadOnly
@@ -151,3 +161,43 @@ class RecipeHig(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         snippet = self.get_object()
         return Response([snippet.name, "---", snippet.description])
+
+@api_view(['GET', 'POST'])
+def searchFor(request, *args, **kwargs):
+    if request.method == 'GET':
+        p = json.loads(request.GET['ingredients'])
+        print(p)
+        j = Product.objects.get(id=p.pop(0)['product'])
+        z = Recipe.objects.filter(Q(recipe_ingredient__fk_product__id=j.id) & Q(recipe_ingredient__main_ingredient=True))
+        z = allFilter(p,z)
+        o = RecipeSerializer(z, many=True)
+        return Response(o.data, status=status.HTTP_200_OK, content_type='application/json')
+
+
+def allFilter(rest_of_ingredients, filter_model_instance):
+    z = []
+    for rest in rest_of_ingredients:
+        product = Product.objects.get(id=rest['product'])
+        z.append(product.id)
+        print(z)
+        # Exact and in the same order
+        filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__contains=product.id))
+    print(filter_model_instance)
+    return filter_model_instance
+
+    # Contains all the products
+    # for rest in rest_of_ingredients:
+    #     product = Product.objects.get(id=rest['product'])
+    #     z.append(product.id)
+    #     print(z)
+    #     # Exact and in the same order
+    #     filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__contains=product.id))
+
+    # Simple filter, Can be use as a conditional
+    #.filter(Q(recipe_ingredient__fk_product__id__in=z))
+
+    # All the results must to be different
+    #.distinct()
+
+    # Greater than 1 ingredient
+    #.annotate(c = Count('recipe_ingredient__fk_product__id')).filter(c__gt = 1)

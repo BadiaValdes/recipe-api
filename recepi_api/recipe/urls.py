@@ -10,6 +10,7 @@ urlpatterns = [
 
     # Category
     path('category/', category_api.CategoryList.as_view(), name="category"),
+    path('category/create', category_api.CategoryCreate.as_view(), name="category"),
     re_path('category/(?P<pk>[0-9a-f]{10})/', category_api.CategoryDetails.as_view(), name="category_details"),
 
     # Difficulty
@@ -27,6 +28,7 @@ urlpatterns = [
     # Product
     path('product/', producto_api.ProductList.as_view(), name="product"),
     re_path('product/(?P<pk>[0-9a-f]{10})/', producto_api.ProductDetail.as_view(), name="product_details"),
+    
 
     # Recipe
     path('recipe/', recipe_api.RecipeList.as_view(), name="recipe"),
@@ -35,6 +37,7 @@ urlpatterns = [
     path('recipe/<slug:slug>/', recipe_api.RecipeDetail.as_view(), name="recipe_image"),
     re_path('recipe/html/(?P<pk>[0-9a-f]{10})', recipe_api.RecipeHig.as_view(), name="recipe_html"),
     path('recipe/image/', recipe_api.RecipeUploadImage.as_view(), name="recipe_image"),
+    path('searchFor/',recipe_api.searchFor, name="searchFor"),
 
     # User Like
     path('userLike/', userlike_api.UserLikeList.as_view(), name="userLike"),

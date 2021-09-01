@@ -58,6 +58,8 @@ class Recipe(models.Model):
     fk_category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     steps = models.CharField(max_length=500, null=True, blank=True)
     fk_user = models.ForeignKey('user.User', on_delete=models.CASCADE, null=True)
+    product = models.ManyToManyField(Product, through='Ingredient') 
+    # Asign a many to many field and use an existing table
 
     def __str__(self):
         return self.name

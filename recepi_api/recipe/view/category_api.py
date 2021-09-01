@@ -22,6 +22,11 @@ from rest_framework import status
 from rest_framework import generics, mixins
 ######
 
+## Permissions
+from rest_framework import permissions
+from ..permissions import IsOwnerOrReadOnly, IsAdminOrReadOnly
+######
+
 
 # Create your views here.
 
@@ -76,10 +81,17 @@ from rest_framework import generics, mixins
 
 # Class base view
 
-class CategoryList(generics.ListCreateAPIView):
-    # The most generic you can be
+class CategoryCommon(object):
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+class CategoryList(CategoryCommon, generics.ListCreateAPIView):
+    # The most generic you can be
+    pass
+
+class CategoryCreate(CategoryCommon, generics.CreateAPIView):
+    pass
 
     # mixin and generic api view (mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView)
     # Use this to left the logic to the frontend
@@ -111,9 +123,8 @@ class CategoryList(generics.ListCreateAPIView):
     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CategoryDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CategoryDetails(CategoryCommon, generics.RetrieveUpdateDestroyAPIView):
+    pass
 
     # with mixins and generic api view (mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView)
     # queryset = Category.objects.all()
