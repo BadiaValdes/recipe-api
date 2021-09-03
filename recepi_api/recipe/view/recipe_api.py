@@ -165,13 +165,14 @@ class RecipeHig(generics.GenericAPIView):
 @api_view(['GET', 'POST'])
 def searchFor(request, *args, **kwargs):
     if request.method == 'GET':
-        p = json.loads(request.GET['ingredients'])
-        print(p)
-        j = Product.objects.get(id=p.pop(0)['product'])
-        z = Recipe.objects.filter(Q(recipe_ingredient__fk_product__id=j.id) & Q(recipe_ingredient__main_ingredient=True))
-        z = allFilter(p,z)
-        o = RecipeSerializer(z, many=True)
-        return Response(o.data, status=status.HTTP_200_OK, content_type='application/json')
+        ingredients = json.loads(request.GET['ingredients']) # Get ingredients ARRAY
+        difficult = Difficulty.objects.get(id=request.GET['difficul']) # Get Difficult
+        product = Product.objects.get(id=ingredients.pop(0)['product']) # Get first Ingredients (MAIN)
+        recipe = Recipe.objects.filter(Q(recipe_ingredient__fk_product__id=product.id) & Q(recipe_ingredient__main_ingredient=True) & Q(fk_difficult=difficult))
+        if len(ingredients) > 0:
+            recipe = allFilter(ingredients,recipe)
+        serealizaer_result = RecipeSerializer(recipe, many=True)
+        return Response(serealizaer_result.data, status=status.HTTP_200_OK, content_type='application/json')
 
 
 def allFilter(rest_of_ingredients, filter_model_instance):
@@ -180,7 +181,6 @@ def allFilter(rest_of_ingredients, filter_model_instance):
         product = Product.objects.get(id=rest['product'])
         z.append(product.id)
         print(z)
-        # Exact and in the same order
         filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__contains=product.id))
     print(filter_model_instance)
     return filter_model_instance
