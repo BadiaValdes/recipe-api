@@ -166,22 +166,43 @@ class RecipeHig(generics.GenericAPIView):
 def searchFor(request, *args, **kwargs):
     if request.method == 'GET':
         ingredients = json.loads(request.GET['ingredients']) # Get ingredients ARRAY
-        difficult = Difficulty.objects.get(id=request.GET['difficul']) # Get Difficult
-        product = Product.objects.get(id=ingredients.pop(0)['product']) # Get first Ingredients (MAIN)
-        recipe = Recipe.objects.filter(Q(recipe_ingredient__fk_product__id=product.id) & Q(recipe_ingredient__main_ingredient=True) & Q(fk_difficult=difficult))
+        difficult_temp = request.GET['difficul'];
+        product = Product.objects.get(id=ingredients.pop(0)['product'])  # Get first Ingredients (MAIN)
+
+        if difficult_temp != '0':
+            difficult = Difficulty.objects.get(id=difficult_temp) # Get Difficult
+            recipe = Recipe.objects.filter(
+                Q(recipe_ingredient__fk_product__id=product.id) & Q(recipe_ingredient__main_ingredient=True) & Q(
+                    fk_difficult=difficult))
+        else:
+            recipe = Recipe.objects.filter(
+                Q(recipe_ingredient__fk_product__id=product.id) & Q(recipe_ingredient__main_ingredient=True))
+
+
         if len(ingredients) > 0:
-            recipe = allFilter(ingredients,recipe)
+            recipe = allTheIngredientsMatters(ingredients,recipe)
         serealizaer_result = RecipeSerializer(recipe, many=True)
         return Response(serealizaer_result.data, status=status.HTTP_200_OK, content_type='application/json')
 
 
-def allFilter(rest_of_ingredients, filter_model_instance):
+def allTheIngredientsMatters(rest_of_ingredients, filter_model_instance):
+    for rest in rest_of_ingredients:
+        product = Product.objects.get(id=rest['product'])
+        filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id=product.id)).distinct()
+    return filter_model_instance
+
+def onlyTheMainIngredientsMatters(rest_of_ingredients, filter_model_instance):
     z = []
     for rest in rest_of_ingredients:
         product = Product.objects.get(id=rest['product'])
         z.append(product.id)
         print(z)
-        filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__contains=product.id))
+    filter_temp = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__in=z)).distinct()
+    # if the filter process is empty,
+    if len(filter_temp) > 0:
+        filter_model_instance = filter_temp
+    else:
+        print("is none")
     print(filter_model_instance)
     return filter_model_instance
 
@@ -193,7 +214,7 @@ def allFilter(rest_of_ingredients, filter_model_instance):
     #     # Exact and in the same order
     #     filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__contains=product.id))
 
-    # Simple filter, Can be use as a conditional
+    # Simple filter, Can be use as a conditional, gets all the recipe that contains any of those ingredients
     #.filter(Q(recipe_ingredient__fk_product__id__in=z))
 
     # All the results must to be different
@@ -201,3 +222,6 @@ def allFilter(rest_of_ingredients, filter_model_instance):
 
     # Greater than 1 ingredient
     #.annotate(c = Count('recipe_ingredient__fk_product__id')).filter(c__gt = 1)
+
+    # All the ingredients in the recipe
+    #.filter(Q(recipe_ingredient__fk_product__id__contains=product.id))
