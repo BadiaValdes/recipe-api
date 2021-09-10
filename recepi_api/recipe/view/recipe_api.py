@@ -135,6 +135,11 @@ class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly
                           ]
+    def perform_destroy(self, instance):
+        instance.img.delete(save=True)
+        instance.delete()
+        
+        
       
                           
 class RecipeDetailJSON(generics.RetrieveUpdateDestroyAPIView):
@@ -167,8 +172,10 @@ def searchFor(request, *args, **kwargs):
     if request.method == 'GET':
         ingredients = json.loads(request.GET['ingredients']) # Get ingredients ARRAY
         difficult_temp = request.GET['difficul'];
+        slide_value = request.GET['slideValue'];      
         product = Product.objects.get(id=ingredients.pop(0)['product'])  # Get first Ingredients (MAIN)
-
+        ingredients_length = len(ingredients)
+	
         if difficult_temp != '0':
             difficult = Difficulty.objects.get(id=difficult_temp) # Get Difficult
             recipe = Recipe.objects.filter(
@@ -179,8 +186,16 @@ def searchFor(request, *args, **kwargs):
                 Q(recipe_ingredient__fk_product__id=product.id) & Q(recipe_ingredient__main_ingredient=True))
 
 
-        if len(ingredients) > 0:
-            recipe = allTheIngredientsMatters(ingredients,recipe)
+        if len(ingredients) > 0 and int(slide_value) != 0:
+            if int(slide_value) == 100: 
+                recipe = allTheIngredientsMatters(ingredients,recipe)
+            else:
+                recipe = onlyTheMainIngredientsMatters(ingredients,recipe)
+            if int(slide_value) == 50:
+            	recipe = theAmountOfIngredientGreaterThan(int(ingredients_length*0.5),recipe)
+            elif int(slide_value) == 75:
+               recipe = theAmountOfIngredientGreaterThan(int(ingredients_length*0.75),recipe)
+        
         serealizaer_result = RecipeSerializer(recipe, many=True)
         return Response(serealizaer_result.data, status=status.HTTP_200_OK, content_type='application/json')
 
@@ -205,6 +220,10 @@ def onlyTheMainIngredientsMatters(rest_of_ingredients, filter_model_instance):
         print("is none")
     print(filter_model_instance)
     return filter_model_instance
+
+def theAmountOfIngredientGreaterThan(greaterThan, filter_model_instance):
+    print(greaterThan)
+    return filter_model_instance.annotate(c = Count('recipe_ingredient__fk_product__id')).filter(c__gt = greaterThan)
 
     # Contains all the products
     # for rest in rest_of_ingredients:
