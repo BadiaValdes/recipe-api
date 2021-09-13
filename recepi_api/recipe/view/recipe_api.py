@@ -172,12 +172,14 @@ def searchFor(request, *args, **kwargs):
     if request.method == 'GET':
         ingredients = json.loads(request.GET['ingredients']) # Get ingredients ARRAY
         difficult_temp = request.GET['difficul'];
-        slide_value = request.GET['slideValue'];      
-        product = Product.objects.get(id=ingredients.pop(0)['product'])  # Get first Ingredients (MAIN)
+        slide_value = request.GET['slideValue'];    
+        product = Product.objects.get(id=ingredients.pop(0)['product']['id'])  # Get first Ingredients (MAIN)
         ingredients_length = len(ingredients)
 	
         if difficult_temp != '0':
+            
             difficult = Difficulty.objects.get(id=difficult_temp) # Get Difficult
+            print(difficult)
             recipe = Recipe.objects.filter(
                 Q(recipe_ingredient__fk_product__id=product.id) & Q(recipe_ingredient__main_ingredient=True) & Q(
                     fk_difficult=difficult))
@@ -202,27 +204,22 @@ def searchFor(request, *args, **kwargs):
 
 def allTheIngredientsMatters(rest_of_ingredients, filter_model_instance):
     for rest in rest_of_ingredients:
-        product = Product.objects.get(id=rest['product'])
+        product = Product.objects.get(id=rest['product']['id'])
         filter_model_instance = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id=product.id)).distinct()
     return filter_model_instance
 
 def onlyTheMainIngredientsMatters(rest_of_ingredients, filter_model_instance):
     z = []
     for rest in rest_of_ingredients:
-        product = Product.objects.get(id=rest['product'])
+        product = Product.objects.get(id=rest['product']['id'])
         z.append(product.id)
-        print(z)
     filter_temp = filter_model_instance.filter(Q(recipe_ingredient__fk_product__id__in=z)).distinct()
     # if the filter process is empty,
     if len(filter_temp) > 0:
         filter_model_instance = filter_temp
-    else:
-        print("is none")
-    print(filter_model_instance)
     return filter_model_instance
 
 def theAmountOfIngredientGreaterThan(greaterThan, filter_model_instance):
-    print(greaterThan)
     return filter_model_instance.annotate(c = Count('recipe_ingredient__fk_product__id')).filter(c__gt = greaterThan)
 
     # Contains all the products
