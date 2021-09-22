@@ -8,7 +8,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         print(request.META['REMOTE_ADDR'])
-        return obj.fk_user == request.user
+        return (obj.fk_user == request.user) or (request.user.is_staff)
         
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):

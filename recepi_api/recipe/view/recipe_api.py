@@ -29,7 +29,7 @@ from ..serialize import RecipeSerializer, RecipeSerializerCreate, ReciepeImageSe
 ############
 
 ## Permissions
-from rest_framework import permissions
+from rest_framework import permissions, filters
 from ..permissions import IsOwnerOrReadOnly
 
 ## QUery
@@ -49,7 +49,10 @@ class RecipeList(RecipeObject, generics.ListCreateAPIView):
    
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, 
     IsOwnerOrReadOnly
-    ]
+    ]   
+     
+    filter_backends = [filters.SearchFilter] # Default rest filters
+    search_fields = ['fk_user__id'] # lookup fields
 
 
     def perform_create(self, serializer):
@@ -57,6 +60,20 @@ class RecipeList(RecipeObject, generics.ListCreateAPIView):
         cat = Category.objects.get(id=self.request.POST['fk_category'])
         dif = Difficulty.objects.get(id=self.request.POST['fk_difficult'])
         serializer.save(recipe_ingredient=ri, fk_category=cat, fk_difficult=dif)
+        
+    # Value depending on the parameter 
+    # with the filters, this part is unnecesary
+    def get_queryset(self):
+    	
+    	# Ask if the kwargs exist and then return the recipe filtered
+    	if len(self.kwargs) > 0 and self.kwargs['userid']:
+    		return Recipe.objects.filter(fk_user=self.kwargs['userid'])
+    		
+    	else:
+    		return Recipe.objects.all()
+    		
+    	
+    
 
 
     # ADD the current user
@@ -171,7 +188,7 @@ class RecipeHig(generics.GenericAPIView):
 def searchFor(request, *args, **kwargs):
     if request.method == 'GET':
         ingredients = json.loads(request.GET['ingredients']) # Get ingredients ARRAY
-        difficult_temp = request.GET['difficul'];
+        difficult_temp = request.GET['difficul'];	
         slide_value = request.GET['slideValue'];    
         product = Product.objects.get(id=ingredients.pop(0)['product']['id'])  # Get first Ingredients (MAIN)
         ingredients_length = len(ingredients)
