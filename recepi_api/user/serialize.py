@@ -49,7 +49,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
         read_only_fields = ['avatar', 'background_image', 'is_active', 'is_staff', 'is_superuser', 'last_login',
-                            'is_superuser', 'user_permissions', 'groups']
+                            'is_superuser', 'user_permissions', 'groups', 'username','password']
 
 
 class UserDetailsAdminSerializer(serializers.ModelSerializer):
@@ -66,11 +66,11 @@ class UserDetailsAdminSerializer(serializers.ModelSerializer):
 class UserPasswordChange(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])  # New Password
     password2 = serializers.CharField(write_only=True, required=True)  # Confirmation
-    old_password = serializers.CharField(write_only=True, required=True)  # Old One
+    #old_password = serializers.CharField(write_only=True, required=True)  # Old One
 
     class Meta:
         model = User
-        fields = ('old_password', 'password', 'password2')  # Same as before
+        fields = ('password', 'password2')  # Same as before
 
     def validate(self, attrs):
         # attrs are the one decleared above
@@ -79,11 +79,11 @@ class UserPasswordChange(serializers.ModelSerializer):
         return attrs
 
     # Old password the same
-    def validate_old_password(self, value):
-        user = self.context['request'].user
-        if not user.check_password(value):
-            raise serializers.ValidationError({"old_password": "Old password is not correct"})
-        return value
+    #def validate_old_password(self, value):
+    #    user = self.context['request'].user
+    #    if not user.check_password(value):
+    #        raise serializers.ValidationError({"old_password": "Old password is not correct"})
+    #    return value
 
     # Make the update request
     def update(self, instance, validated_data):

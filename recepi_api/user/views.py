@@ -43,6 +43,10 @@ class UserDetail(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailsSerializer
 
+class UserDetailByUsername(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserDetailsSerializer
+    lookup_field = 'username'
     
 class UserChangePassword(generics.UpdateAPIView):
     queryset = User.objects.all()

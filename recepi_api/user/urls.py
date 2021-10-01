@@ -13,4 +13,5 @@ urlpatterns = [
     # path('user/', views.UserDetail.as_view(), name="user_details2"),
     # path('users/<username>/', views.UserDetail.as_view(), name="user_details"),
     re_path('users/(?P<pk>[0-9a-f]{32})/', views.UserDetail.as_view(), name="user_details"),
+    path('user/<username>/', views.UserDetailByUsername.as_view(), name="user_details_by_name"),
 ]
