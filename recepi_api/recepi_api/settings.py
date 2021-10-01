@@ -129,19 +129,32 @@ WSGI_APPLICATION = 'recepi_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'recipe',
+#        'USER': 'postgres',
+        # 'HOST': 'localhost',
+        # 'PASSWORD': 'postgres',
+#        'PASSWORD': 'postgres',
+#        'HOST': '127.0.0.1',
+#        'PORT': '5432',
+#    }
+#}
+
+# Heroku DB
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'recipe',
-        'USER': 'postgres',
+        'NAME': 'd9adsdlt2nmp3m',
+        'USER': 'lbwceywcrttahs',
         # 'HOST': 'localhost',
         # 'PASSWORD': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'f6750ae4829f6f0c6f2520e6f9a6c335f9899e995501eeefd5668008c048789b',
+        'HOST': 'ec2-44-198-154-255.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
